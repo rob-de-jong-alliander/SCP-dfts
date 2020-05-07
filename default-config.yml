@@ -17,7 +17,7 @@ general:
     - "frontendUnitTests"
     - "frontendIntegrationTests"
     - "s4SdkQualityChecks"
-    - "Third-partyChecks"
+    - "sonarQubeScan"
     - "artifactDeployment"
     - "productionDeployment"
 
