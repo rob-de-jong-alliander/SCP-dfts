@@ -1,0 +1,131 @@
+#Project Setup
+general:
+  unsafeMode: false
+  productiveBranch: master
+  collectTelemetryData: true
+  defaultNode: ""
+  automaticVersioning: true
+  runStageInPod: true
+  mandatoryStages:
+    - "initS4sdkPipeline"
+    - "build"
+    - "backendIntegrationTests"
+    - "staticCodeChecks"
+    - "unitTests"
+    - "npmAudit"
+    - "lint"
+    - "frontendUnitTests"
+    - "frontendIntegrationTests"
+    - "s4SdkQualityChecks"
+    - "Third-partyChecks"
+    - "artifactDeployment"
+    - "productionDeployment"
+
+#Steps Specific Configuration
+steps:
+  piperStageWrapper:
+    globalExtensionsDirectory: 's4hana_pipeline/extensions/'
+    stageLocking: false
+    stashContent: []
+
+  artifactSetVersion:
+    gitCredentialsId: ""
+    commitVersion: false
+    buildTool: "maven"
+    timestampTemplate: "%Y-%m-%dT%H%M%S%Z"
+
+  mavenExecute:
+    dockerImage: maven:3.6.3-jdk-8-slim
+    dockerOptions: ""
+    m2Path: s4hana_pipeline/maven_local_repo
+
+  executeNpm:
+    dockerImage: ppiper/node-browsers:v3
+    sapNpmRegistry: "https://npm.sap.com"
+
+  executeGradle:
+    dockerImage: gradle:6.0.0-jdk8
+
+  executeSourceClearScan:
+    dockerImage: ppiper/mta-archive-builder:v1
+
+  checkFindbugs:
+    includeFilterFile: s4hana_findbugs_include_filter.xml
+    scanModules:
+      - "application"
+
+  createHdiContainer:
+    dockerImage: ppiper/cf-cli:v2
+
+  executeFortifyScan:
+    verbose: false
+    sourceVersion: 1.8
+    use64BitVersion: true
+    maximumMemoryUsage: 3000M
+    exclude: "**/resources/**/*,**/target/**/*,**/unit-tests/**/*,**/integration-tests/**/*"
+    skipNgComponents: true
+
+  checkPmd:
+    scanModules:
+      - "application"
+
+  checkJMeter:
+    dockerImage: famiko/jmeter-base
+    testPlan: ./performance-tests/*
+    reportDirectory: /jmeter-report
+    failThreshold: 100
+    unstableThreshold: 90
+
+  cloudFoundryDeploy:
+    dockerImage: ppiper/cf-cli:v2
+    keepOldInstance: true
+    stashContent: []
+
+  cloudFoundryCreateService:
+    stashContent: []
+
+  neoDeploy:
+    dockerImage: ppiper/neo-cli:v2
+    deployMode: "warParams"
+    neoHome: "/sdk"
+
+  mtaBuild:
+    buildTarget: "CF"
+    mtaBuildTool: "cloudMbt"
+
+  checkFrontendCodeCoverage:
+    codeCoverageFrontend:
+      unstable: 0
+      failing: 0
+
+  tmsUpload:
+    namedUser: "CLOUD_SDK_PIPELINE"
+
+  sonarExecuteScan:
+    dockerImage: 'ppiper/node-browsers:v3'
+
+#Stage Specific Configurations
+stages:
+  backendIntegrationTests:
+    retry: 1
+    forkCount: 1C
+
+  endToEndTests:
+    enableZeroDowntimeDeployment: false
+    onlyRunInProductiveBranch: false
+
+  checkmarxScan:
+    filterPattern: "!**/*.log, !**/*.lock, !**/*.json, !**/*.html, !**/Cx*, !**/test/**, !s4hana_pipeline/**, !**/unit-tests/**, !**/integration-tests/**, !**/frontend-unit-tests/**, !**/e2e-tests/**, !**/performance-tests/**, **/*.js, **/*.java, **/*.ts"
+    fullScansScheduled: true
+    generatePdfReport: true
+    incremental: true
+    preset: "36"
+    vulnerabilityThresholdLow: 99999
+    vulnerabilityThresholdMedium: 0
+
+  artifactDeployment:
+    nexus:
+      version: nexus3
+
+  s4SdkQualityChecks:
+    disabledChecks: []
