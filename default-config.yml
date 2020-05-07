@@ -18,7 +18,6 @@ general:
     - "frontendIntegrationTests"
     - "s4SdkQualityChecks"
     - "sonarQubeScan"
-    - "artifactDeployment"
     - "productionDeployment"
 
 #Steps Specific Configuration
