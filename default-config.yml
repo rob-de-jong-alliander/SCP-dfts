@@ -113,9 +113,5 @@ stages:
     enableZeroDowntimeDeployment: false
     onlyRunInProductiveBranch: false
 
-  artifactDeployment:
-    nexus:
-      version: nexus3
-
-  s4SdkQualityChecks:
+    s4SdkQualityChecks:
     disabledChecks: []
