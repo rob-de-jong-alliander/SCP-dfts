@@ -106,5 +106,5 @@ stages:
     enableZeroDowntimeDeployment: false
     onlyRunInProductiveBranch: false
 
-    s4SdkQualityChecks:
+  s4SdkQualityChecks:
     disabledChecks: []
