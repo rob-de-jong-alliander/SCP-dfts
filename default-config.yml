@@ -9,14 +9,7 @@ general:
   mandatoryStages:
     - "initS4sdkPipeline"
     - "build"
-    - "backendIntegrationTests"
-    - "staticCodeChecks"
-    - "unitTests"
     - "npmAudit"
-    - "lint"
-    - "frontendUnitTests"
-    - "frontendIntegrationTests"
-    - "s4SdkQualityChecks"
     - "sonarQubeScan"
     - "productionDeployment"
 
